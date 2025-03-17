@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uplus.eureka.domain.vote.repository.VoteMapper">
+
+    <!-- 투표 조회 -->
+    <select id="getVoteById" resultType="com.uplus.eureka.domain.vote.Vote">
+        SELECT * FROM vote WHERE vote_id = #{voteId}
+    </select>
+
+    <!-- 참여자 수 증가 -->
+    <update id="incrementParticipants">
+        UPDATE vote SET participants = participants + 1 WHERE vote_id = #{voteId}
+    </update>
+
+</mapper>

@@ -72,6 +72,12 @@
     		<version>1.18.36</version>
     		<scope>provided</scope>
 		</dependency>
+		<!-- swagger를 위한 의존성 추가 -->
+		<dependency>
+		    <groupId>org.springdoc</groupId>
+		    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+		    <version>2.6.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

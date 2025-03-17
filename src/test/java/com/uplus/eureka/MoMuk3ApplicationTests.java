@@ -1,31 +1,24 @@
-//package com.uplus.eureka;
+//import static org.junit.jupiter.api.Assertions.assertNotNull;
 //
-//import com.uplus.eureka.dao.VoteDao;
-//import com.uplus.eureka.dto.VoteDto;
 //import org.junit.jupiter.api.Test;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.test.context.ContextConfiguration;
 //
-//import java.util.List;
-//
-//import static org.junit.jupiter.api.Assertions.*;
+//import com.uplus.eureka.domain.vote.Vote;
+//import com.uplus.eureka.domain.vote.repository.VoteMapper;
 //
 //@SpringBootTest
-//class MoMuk3ApplicationTests {
-//    private static final Logger logger = LoggerFactory.getLogger(MoMuk3ApplicationTests.class);
+//@ContextConfiguration(classes = MoMuk3Application.class)
+//public class MoMuk3ApplicationTests {
 //
 //    @Autowired
-//    private VoteDao voteDao;
+//    private VoteMapper voteMapper;
 //
 //    @Test
-//    void testFindAllActiveVotes() {
-//        logger.debug("Testing findAllActiveVotes...");
-//
-//        List<VoteDto> activeVotes = voteDao.findAllActiveVotes();
-//        assertNotNull(activeVotes, "Active votes should not be null");
-//        assertTrue(activeVotes.size() > 0, "There should be at least one active vote");
+//    public void testGetVoteById() {
+//        Vote vote = voteMapper.getVoteById(1);
+//        assertNotNull(vote);
+//        System.out.println(vote);
 //    }
 //}
-//
