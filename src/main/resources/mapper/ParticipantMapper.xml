@@ -9,7 +9,7 @@
         VALUES (#{userId}, #{voteId}, #{createdAt})
     </insert>
 
-    <!-- 중복 참여 확인 -->
+    <!-- 한 투표글에 중복 참여 확인 -->
     <select id="existsByUserIdAndVoteId" resultType="boolean">
         SELECT EXISTS (
             SELECT 1 FROM participant WHERE user_id = #{userId} AND vote_id = #{voteId}
