@@ -47,6 +47,41 @@ public class UserController {
         
         return new ResponseEntity<>(resultMap, status);
     }
-
     
+    @Operation(summary = "로그인", description = "아이디와 비밀번호를 이용하여 로그인 처리합니다.")
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, Object>> login(
+            @RequestBody @Parameter(description = "로그인 시 필요한 회원정보(아이디, 비밀번호).", required = true) User user) {
+        log.debug("login user : {}", user);
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status = HttpStatus.ACCEPTED;
+        
+        try {
+            User loginUser = userService.login(user);
+            
+            if (loginUser != null) {
+                String accessToken = jwtUtil.createAccessToken(loginUser.getUserId());
+                String refreshToken = jwtUtil.createRefreshToken(loginUser.getUserId());
+                
+                log.debug("access token : {}", accessToken);
+                log.debug("refresh token : {}", refreshToken);
+                
+                // 발급받은 refresh token을 DB에 저장
+                userService.saveRefreshToken(loginUser.getUserId(), refreshToken);
+                
+                resultMap.put("access-token", accessToken);
+                resultMap.put("refresh-token", refreshToken);
+                status = HttpStatus.CREATED;
+            } else {
+                resultMap.put("message", "아이디 또는 패스워드를 확인해 주세요.");
+                status = HttpStatus.UNAUTHORIZED;
+            }
+        } catch (Exception e) {
+            log.debug("로그인 에러 발생 : {}", e);
+            resultMap.put("message", e.getMessage());
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+        
+        return new ResponseEntity<>(resultMap, status);
+    }
 }
