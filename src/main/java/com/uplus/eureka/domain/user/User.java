@@ -1,10 +1,20 @@
 package com.uplus.eureka.domain.user;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 public class User {
-    private Integer userId; // 사용자 ID
-    private String name;    // 사용자 이름
-    private String profile; // 사용자 프로필
+    private String userId;
+    private String userName;
+    private String userPwd;
+    private String emailId;
+    private String emailDomain;
+    private String joinDate;
+    private String refreshToken;
 }

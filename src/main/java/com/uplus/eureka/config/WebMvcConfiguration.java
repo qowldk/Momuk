@@ -1,3 +1,4 @@
+// src/main/java/com/uplus/eureka/config/WebMvcConfiguration.java
 package com.uplus.eureka.config;
 
 import org.mybatis.spring.annotation.MapperScan;

@@ -6,5 +6,5 @@ import com.uplus.eureka.domain.participant.Participant;
 public interface ParticipantMapper {
     void insertParticipant(Participant participant);
     
-    boolean existsByUserIdAndVoteId(@Param("userId") Integer userId, @Param("voteId") Integer voteId);
+    boolean existsByUserIdAndVoteId(@Param("userId") String userId, @Param("voteId") Integer voteId);
 }

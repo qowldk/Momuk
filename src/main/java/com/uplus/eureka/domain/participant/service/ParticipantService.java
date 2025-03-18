@@ -18,7 +18,7 @@ public class ParticipantService {
     private final VoteMapper voteMapper; 
 
     @Transactional
-    public void registerParticipation(Integer voteId, Integer userId) {
+    public void registerParticipation(Integer voteId, String userId) {
         // 투표 존재 여부 확인
         if (voteMapper.getVoteById(voteId) == null) {
             throw new RuntimeException("존재하지 않는 투표입니다.");

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.uplus.eureka.domain.user.repository.UserMapper">
+
+    <select id="login" parameterType="com.uplus.eureka.domain.user.User" resultType="com.uplus.eureka.domain.user.User">
+        SELECT user_id AS userId, user_name AS userName, user_pwd AS userPwd, 
+               email_id AS emailId, email_domain AS emailDomain, join_date AS joinDate
+        FROM users
+        WHERE user_id = #{userId} AND user_pwd = #{userPwd}
+    </select>
+    
+    <insert id="signup" parameterType="com.uplus.eureka.domain.user.User">
+        INSERT INTO users (user_id, user_name, user_pwd, email_id, email_domain, join_date)
+        VALUES (#{userId}, #{userName}, #{userPwd}, #{emailId}, #{emailDomain}, NOW())
+    </insert>
+    
+    <select id="getUserById" parameterType="string" resultType="com.uplus.eureka.domain.user.User">
+        SELECT user_id AS userId, user_name AS userName, 
+               email_id AS emailId, email_domain AS emailDomain, join_date AS joinDate
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+    
+    <update id="saveRefreshToken" parameterType="map">
+        UPDATE users
+        SET refresh_token = #{token}
+        WHERE user_id = #{userId}
+    </update>
+    
+    <select id="getRefreshToken" parameterType="string" resultType="string">
+        SELECT refresh_token
+        FROM users
+        WHERE user_id = #{userId}
+    </select>
+    
+    <update id="deleteRefreshToken" parameterType="map">
+        UPDATE users
+        SET refresh_token = #{token}
+        WHERE user_id = #{userId}
+    </update>
+    
+</mapper>

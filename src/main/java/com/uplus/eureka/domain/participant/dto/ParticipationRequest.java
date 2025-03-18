@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class ParticipationRequest {
-    private Integer userId;
+    private String userId;
 }
