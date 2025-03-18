@@ -77,4 +77,19 @@ public class JwtUtil {
         
         return claims.get("userId", String.class);
     }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token);  // 수정된 부분
+            return true;
+        } catch (ExpiredJwtException e) {
+            log.error("JWT 토큰이 만료되었습니다.");
+        } catch (Exception e) {
+            log.error("유효하지 않은 JWT 토큰입니다.");
+        }
+        return false;
+    }
+
+
+
 }
