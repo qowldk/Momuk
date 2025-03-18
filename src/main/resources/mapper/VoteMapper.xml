@@ -12,5 +12,13 @@
     <update id="incrementParticipants">
         UPDATE vote SET participants = participants + 1 WHERE vote_id = #{voteId}
     </update>
+    
+    <!-- 투표 생성 -->
+   <insert id="insertVote" parameterType="com.uplus.eureka.domain.vote.dto.VoteRequest">
+    INSERT INTO vote (title, description, deadline, meeting_start_time, meeting_end_time, recruit)
+    VALUES (#{title}, #{description}, #{deadline}, 
+            #{meetingStartTime}, #{meetingEndTime}, #{recruit})
+	</insert>
 
+    
 </mapper>

@@ -19,4 +19,7 @@ public class Vote {
     private String restaurantName;    // 가게명
     private Double latitude;          // 가게 위도
     private Double longitude;         // 가게 경도
+    
+    private String userId;            // 사용자의 ID (외래키)
+
 }
