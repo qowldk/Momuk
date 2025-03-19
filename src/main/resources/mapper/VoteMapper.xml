@@ -3,10 +3,25 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.uplus.eureka.domain.vote.repository.VoteMapper">
 
-    <!-- 투표 조회 -->
+    <!-- 투표 조회
     <select id="getVoteById" resultType="com.uplus.eureka.domain.vote.Vote">
-        SELECT * FROM vote WHERE vote_id = #{voteId}
+       	SELECT vote_id, creator_id FROM vote WHERE vote_id = #{voteId}
     </select>
+    -->
+    <resultMap id="VoteResultMap" type="com.uplus.eureka.domain.vote.Vote">
+    	<id column="vote_id" property="voteId"/>
+    	<result column="creator_id" property="creatorId"/>
+    	<result column="title" property="title"/>
+    	<result column="description" property="description"/>
+    	<result column="deadline" property="deadline"/>
+    	<result column="meeting_start_time" property="meetingStartTime"/>
+    	<result column="meeting_end_time" property="meetingEndTime"/>
+    	<result column="recruit" property="recruit"/>
+	</resultMap>
+
+	<select id="getVoteById" resultMap="VoteResultMap">
+	    SELECT * FROM vote WHERE vote_id = #{voteId}
+	</select>
 
     <!-- 참여자 수 증가 -->
     <update id="incrementParticipants">
@@ -14,18 +29,28 @@
     </update>
     
     <!-- 투표 생성 -->
-	 <insert id="insertVote" parameterType="map">
-    INSERT INTO vote (creator_id, title, description, deadline, meeting_start_time, meeting_end_time, recruit)
-    VALUES (#{creatorId}, #{voteRequest.title}, #{voteRequest.description}, #{voteRequest.deadline}, 
-            #{voteRequest.meetingStartTime}, #{voteRequest.meetingEndTime}, #{voteRequest.recruit});
-  </insert>
+	 <insert id="insertVote" parameterType="com.uplus.eureka.domain.vote.dto.VoteRequest">
+     INSERT INTO vote (creator_id, title, description, deadline, meeting_start_time, meeting_end_time, recruit)
+    VALUES (#{creatorId}, #{title}, #{description}, #{deadline}, #{meetingStartTime}, #{meetingEndTime}, #{recruit});
+	</insert>
 
      <!-- 참여자 수 감소 -->
     <update id="decrementParticipant">
         UPDATE vote SET participants = participants - 1 WHERE vote_id = #{voteId}
     </update>
 
-    <!-- 투표 삭제 -->
+     <!-- 투표 수정 -->
+     <update id="updateVote" parameterType="map">
+        UPDATE vote
+        SET title = #{voteRequest.title},
+            description = #{voteRequest.description},
+            deadline = #{voteRequest.deadline},
+            meeting_start_time = #{voteRequest.meetingStartTime},
+            meeting_end_time = #{voteRequest.meetingEndTime},
+            recruit = #{voteRequest.recruit}
+        WHERE vote_id = #{voteId};
+    </update>
+
     <!-- 해당 투표의 작성자(creator_id) 조회 -->
     <select id="getVoteCreator" resultType="string">
         SELECT creator_id FROM vote WHERE vote_id = #{voteId}
@@ -61,4 +86,5 @@
     <select id="getVoteStatus" resultType="com.uplus.eureka.domain.vote.Vote">
         SELECT * FROM vote WHERE vote_id = #{voteId}
     </select>
+
 </mapper>

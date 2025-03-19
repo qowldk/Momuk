@@ -15,9 +15,14 @@ public interface VoteMapper {
 
     // 투표 참여자 수 증가
     void incrementParticipants(Integer voteId);
-
+    
     //투표 생성
-    void insertVote(@Param("voteRequest") VoteRequest voteRequest, @Param("creatorId") String creatorId);
+    void insertVote(VoteRequest voteRequest);
+  
+    void decrementParticipant(Integer voteId);
+
+    //투표 수정
+    void updateVote(@Param("voteId") Integer voteId, @Param("voteRequest") VoteRequest voteRequest);
 
     // 투표글 ID로 작성자 ID 조회
     String getVoteCreator(@Param("voteId") Integer voteId);
@@ -49,6 +54,4 @@ public interface VoteMapper {
      * 특정 투표글 상태 조회
      */
     Vote getVoteStatus(@Param("voteId") Integer voteId);
-  
-    void decrementParticipant(Integer voteId);
 }
