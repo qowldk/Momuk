@@ -1,7 +1,9 @@
 package com.uplus.eureka.domain.user.controller;
 
 import com.uplus.eureka.config.JwtUtil;
-import com.uplus.eureka.domain.user.User;
+import com.uplus.eureka.domain.user.dto.LoginRequestDTO;
+import com.uplus.eureka.domain.user.dto.SignupRequestDTO;
+import com.uplus.eureka.domain.user.dto.UserResponseDTO;
 import com.uplus.eureka.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,13 +34,14 @@ public class UserController {
     @Operation(summary = "회원가입", description = "새로운 사용자 정보를 등록합니다.")
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> signup(
-            @RequestBody @Parameter(description = "회원가입 시 필요한 회원정보", required = true) User user) {
+            @RequestBody @Parameter(description = "회원가입 시 필요한 회원정보", required = true) SignupRequestDTO signupRequestDTO) {
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.CREATED;
         
         try {
-            userService.signup(user);
+            userService.signup(signupRequestDTO);
             resultMap.put("message", "회원가입이 성공적으로 완료되었습니다.");
+            log.info("회원가입 성공: {}", signupRequestDTO.getUserId());
         } catch (Exception e) {
             log.error("회원가입 에러 발생 : {}", e.getMessage());
             resultMap.put("message", e.getMessage());
@@ -51,37 +54,40 @@ public class UserController {
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 이용하여 로그인 처리합니다.")
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(
-            @RequestBody @Parameter(description = "로그인 시 필요한 회원정보(아이디, 비밀번호).", required = true) User user) {
-        log.debug("login user : {}", user);
+            @RequestBody @Parameter(description = "로그인 시 필요한 회원정보(아이디, 비밀번호).", required = true) LoginRequestDTO loginRequestDTO) {
+        log.debug("login user : {}", loginRequestDTO);
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.ACCEPTED;
         
         try {
-            User loginUser = userService.login(user);
+            UserResponseDTO userResponseDTO = userService.login(loginRequestDTO);
             
-            if (loginUser != null) {
-                String accessToken = jwtUtil.createAccessToken(loginUser.getUserId());
-                String refreshToken = jwtUtil.createRefreshToken(loginUser.getUserId());
+            if (userResponseDTO != null) {
+                String accessToken = jwtUtil.createAccessToken(userResponseDTO.getUserId());
+                String refreshToken = jwtUtil.createRefreshToken(userResponseDTO.getUserId());
                 
                 log.debug("access token : {}", accessToken);
                 log.debug("refresh token : {}", refreshToken);
                 
                 // 발급받은 refresh token을 DB에 저장
-                userService.saveRefreshToken(loginUser.getUserId(), refreshToken);
+                userService.saveRefreshToken(userResponseDTO.getUserId(), refreshToken);
                 
+                resultMap.put("userInfo", userResponseDTO);
                 resultMap.put("access-token", accessToken);
                 resultMap.put("refresh-token", refreshToken);
                 status = HttpStatus.CREATED;
+                log.info("로그인 성공: {}", userResponseDTO.getUserId());
             } else {
                 resultMap.put("message", "아이디 또는 패스워드를 확인해 주세요.");
                 status = HttpStatus.UNAUTHORIZED;
+                log.warn("로그인 실패: 아이디 또는 패스워드 불일치");
             }
         } catch (Exception e) {
-            log.debug("로그인 에러 발생 : {}", e);
+            log.error("로그인 에러 발생 : {}", e);
             resultMap.put("message", e.getMessage());
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
-
+        
         return new ResponseEntity<>(resultMap, status);
     }
 
@@ -100,6 +106,7 @@ public class UserController {
             if (!jwtUtil.validateToken(refreshToken)) {
                 resultMap.put("message", "유효하지 않거나 만료된 Refresh Token입니다.");
                 status = HttpStatus.UNAUTHORIZED;
+                log.warn("유효하지 않은 Refresh Token");
                 return new ResponseEntity<>(resultMap, status);
             }
 
@@ -111,6 +118,7 @@ public class UserController {
 
             resultMap.put("access-token", newAccessToken);
             status = HttpStatus.OK;
+            log.info("Access Token 재발급 성공: {}", userId);
         } catch (Exception e) {
             log.error("Refresh token 처리 중 오류 발생: {}", e.getMessage());
             resultMap.put("message", "Refresh Token 처리 중 오류가 발생했습니다.");
@@ -129,7 +137,9 @@ public class UserController {
 
         try {
             userService.deleteRefreshToken(userId);
+            resultMap.put("message", "로그아웃이 성공적으로 처리되었습니다.");
             status = HttpStatus.OK;
+            log.info("로그아웃 성공: {}", userId);
         } catch (Exception e) {
             log.error("로그아웃 실패 : {}", e);
             resultMap.put("message", e.getMessage());
@@ -153,8 +163,8 @@ public class UserController {
             if (jwtUtil.checkToken(token)) {
                 log.info("사용 가능한 토큰!!!");
                 try {
-                    User user = userService.getUserById(userId);
-                    resultMap.put("userInfo", user);
+                    UserResponseDTO userResponseDTO = userService.getUserById(userId);
+                    resultMap.put("userInfo", userResponseDTO);
                     status = HttpStatus.OK;
                 } catch (Exception e) {
                     log.error("정보조회 실패 : {}", e);
@@ -163,16 +173,15 @@ public class UserController {
                 }
             } else {
                 log.error("사용 불가능 토큰!!!");
+                resultMap.put("message", "인증 토큰이 유효하지 않습니다.");
                 status = HttpStatus.UNAUTHORIZED;
             }
         } else {
             log.error("토큰이 존재하지 않거나 형식이 잘못되었습니다.");
+            resultMap.put("message", "인증 토큰이 필요합니다.");
             status = HttpStatus.BAD_REQUEST;
         }
         
         return new ResponseEntity<>(resultMap, status);
     }
-
-
-
 }
