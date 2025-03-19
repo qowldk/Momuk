@@ -20,8 +20,14 @@ public class ParticipantService {
     @Transactional
     public void registerParticipation(Integer voteId, String userId) {
         // 투표 존재 여부 확인
-        if (voteMapper.getVoteById(voteId) == null) {
+        var vote = voteMapper.getVoteById(voteId);
+        if (vote == null) {
             throw new RuntimeException("존재하지 않는 투표입니다.");
+        }
+
+        // 투표 가능 상태인지 확인
+        if (!"active".equals(vote.getStatus())) {
+            throw new RuntimeException("이미 마감된 투표입니다.");
         }
 
         // 이미 참여했는지 확인 (중복 참여 방지)
@@ -35,8 +41,30 @@ public class ParticipantService {
         participant.setUserId(userId);
         participant.setCreatedAt(LocalDateTime.now());
         participantMapper.insertParticipant(participant);
-        
+
         // 참여 인원 업데이트
         voteMapper.incrementParticipants(voteId);
     }
+    
+
+    @Transactional
+    public void cancelParticipation(Integer voteId, String userId) {
+        // 투표 존재 여부 확인
+        if (voteMapper.getVoteById(voteId) == null) {
+            throw new RuntimeException("존재하지 않는 투표입니다.");
+        }
+
+        // 참여 여부 확인 (취소하려는 투표에 참여한 사용자만 처리)
+        if (!participantMapper.existsByUserIdAndVoteId(userId, voteId)) {
+            throw new RuntimeException("참여하지 않은 투표입니다.");
+        }
+
+        // 참여 취소
+        participantMapper.deleteParticipant(voteId, userId);
+
+        // 참여 인원 감소
+        voteMapper.decrementParticipant(voteId);
+    }
+
+
 }

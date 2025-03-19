@@ -19,4 +19,5 @@ public interface VoteMapper {
     //투표 생성
     void insertVote(@Param("voteRequest") VoteRequest voteRequest, @Param("creatorId") String creatorId);
   
+    void decrementParticipant(Integer voteId);
 }

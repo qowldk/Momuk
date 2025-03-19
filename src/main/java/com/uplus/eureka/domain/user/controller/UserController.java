@@ -138,6 +138,41 @@ public class UserController {
 
         return new ResponseEntity<>(resultMap, status);
     }
+    
+    @Operation(summary = "회원인증", description = "회원 정보를 담은 Token을 반환합니다.")
+    @GetMapping("/{userId}")
+    public ResponseEntity<Map<String, Object>> getUserInfo(
+            @PathVariable("userId") @Parameter(description = "인증할 회원의 아이디.", required = true) String userId,
+            HttpServletRequest request) {
+        Map<String, Object> resultMap = new HashMap<>();
+        HttpStatus status = HttpStatus.ACCEPTED;
+        
+        String authorizationHeader = request.getHeader("Authorization");
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7); // "Bearer " 부분을 제거
+            if (jwtUtil.checkToken(token)) {
+                log.info("사용 가능한 토큰!!!");
+                try {
+                    User user = userService.getUserById(userId);
+                    resultMap.put("userInfo", user);
+                    status = HttpStatus.OK;
+                } catch (Exception e) {
+                    log.error("정보조회 실패 : {}", e);
+                    resultMap.put("message", e.getMessage());
+                    status = HttpStatus.INTERNAL_SERVER_ERROR;
+                }
+            } else {
+                log.error("사용 불가능 토큰!!!");
+                status = HttpStatus.UNAUTHORIZED;
+            }
+        } else {
+            log.error("토큰이 존재하지 않거나 형식이 잘못되었습니다.");
+            status = HttpStatus.BAD_REQUEST;
+        }
+        
+        return new ResponseEntity<>(resultMap, status);
+    }
+
 
 
 }

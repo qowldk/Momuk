@@ -1,3 +1,4 @@
+
 package com.uplus.eureka.config;
 
 import org.mybatis.spring.annotation.MapperScan;
@@ -5,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -26,6 +28,14 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addViewControllers(ViewControllerRegistry registry) {
 		registry.addViewController("/").setViewName("index2");
+		
 	}
+	@Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("/img/**").addResourceLocations("classpath:/static/assets/img/");
+		registry.addResourceHandler("/*.html**").addResourceLocations("classpath:/static/");
+        registry.addResourceHandler("/swagger-ui.html**").addResourceLocations("classpath:/META-INF/resources/swagger-ui.html");
+        registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
+    }
 	
 }
