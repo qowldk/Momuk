@@ -16,7 +16,7 @@ public class VoteService {
 	private final VoteMapper voteMapper;
 	
 //	 @Transactional
-	    public void createVote(VoteRequest voteRequest) {
+	    public void createVote(VoteRequest voteRequest, String creatorId) {
 		    log.info("메서드 호출됨");
 
 		  if (voteRequest.getTitle() == null || voteRequest.getTitle().isEmpty()) {
@@ -31,7 +31,7 @@ public class VoteService {
 	        log.info("메서드 호출 전");
 	        
 	        // 데이터베이스에 투표 삽입
-	        voteMapper.insertVote(voteRequest);
+	        voteMapper.insertVote(voteRequest, creatorId);
 
 	        log.info("insertVote 실행 완료, 투표 제목: {}", voteRequest.getTitle());
 	        

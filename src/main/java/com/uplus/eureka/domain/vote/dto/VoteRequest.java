@@ -11,8 +11,6 @@ public class VoteRequest{
     private LocalDateTime meetingStartTime;
     private LocalDateTime meetingEndTime;
     private Integer recruit;
-    
-    private String userId;
 
     }
 

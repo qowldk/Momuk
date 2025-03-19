@@ -44,18 +44,12 @@ public class VoteController {
             return ResponseEntity.status(401).body("인증에 실패했습니다.");
         }
 
-        // JWT에서 userId 추출
-        String userId = jwtUtil.getUserIdFromToken(token);
-        log.info("투표 생성 요청: 사용자 ID: {}, 투표 데이터: {}", userId, voteRequest);
+        // JWT에서 userId 추출 (creatorId로 사용)
+        String creatorId = jwtUtil.getUserIdFromToken(token);
+        log.info("투표 생성 요청: 사용자 ID: {}, 투표 데이터: {}", creatorId, voteRequest);
 
         // 투표 생성
-        log.info("Controller에서 createVote 메서드 호출됨");
-
-        voteRequest.setUserId(userId);
-        voteService.createVote(voteRequest);
-        
-        
-
+        voteService.createVote(voteRequest, creatorId);
 
         log.info("투표 생성 완료: {}", voteRequest);
         return ResponseEntity.status(201).body("투표가 성공적으로 생성되었습니다.");

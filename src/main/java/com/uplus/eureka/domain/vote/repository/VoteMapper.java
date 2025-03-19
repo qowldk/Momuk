@@ -1,6 +1,7 @@
 package com.uplus.eureka.domain.vote.repository;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 import com.uplus.eureka.domain.vote.Vote;
 import com.uplus.eureka.domain.vote.dto.VoteRequest;
@@ -16,6 +17,6 @@ public interface VoteMapper {
     void incrementParticipants(Integer voteId);
     
     //투표 생성
-    void insertVote(VoteRequest voteRequest); 
+    void insertVote(@Param("voteRequest") VoteRequest voteRequest, @Param("creatorId") String creatorId);
   
 }
