@@ -17,7 +17,11 @@ public interface VoteMapper {
     void incrementParticipants(Integer voteId);
     
     //투표 생성
-    void insertVote(@Param("voteRequest") VoteRequest voteRequest, @Param("creatorId") String creatorId);
+    void insertVote(VoteRequest voteRequest);
   
     void decrementParticipant(Integer voteId);
+
+    //투표 수정
+    void updateVote(@Param("voteId") Integer voteId, @Param("voteRequest") VoteRequest voteRequest);
+
 }
