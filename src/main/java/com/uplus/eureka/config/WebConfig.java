@@ -1,3 +1,4 @@
+// src/main/java/com/uplus/eureka/config/WebConfig.java
 package com.uplus.eureka.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,9 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/users/login",
                         "/api/users/signup",
                         "/api/users/logout/{userId}",
+                        "/api/users/refresh",
+                        "/api/votes/status",
+                        "/api/votes/auto-close",
                         "/swagger-ui/**",
                         "/v3/api-docs/**"
                 );

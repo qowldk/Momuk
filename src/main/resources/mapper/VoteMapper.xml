@@ -3,7 +3,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.uplus.eureka.domain.vote.repository.VoteMapper">
 
-    <!-- 투표 조회 
+    <!-- 투표 조회
     <select id="getVoteById" resultType="com.uplus.eureka.domain.vote.Vote">
        	SELECT vote_id, creator_id FROM vote WHERE vote_id = #{voteId}
     </select>
@@ -18,7 +18,7 @@
     	<result column="meeting_end_time" property="meetingEndTime"/>
     	<result column="recruit" property="recruit"/>
 	</resultMap>
-	
+
 	<select id="getVoteById" resultMap="VoteResultMap">
 	    SELECT * FROM vote WHERE vote_id = #{voteId}
 	</select>
@@ -38,7 +38,7 @@
     <update id="decrementParticipant">
         UPDATE vote SET participants = participants - 1 WHERE vote_id = #{voteId}
     </update>
-    
+
      <!-- 투표 수정 -->
      <update id="updateVote" parameterType="map">
         UPDATE vote
@@ -50,5 +50,41 @@
             recruit = #{voteRequest.recruit}
         WHERE vote_id = #{voteId};
     </update>
-  
+
+    <!-- 해당 투표의 작성자(creator_id) 조회 -->
+    <select id="getVoteCreator" resultType="string">
+        SELECT creator_id FROM vote WHERE vote_id = #{voteId}
+    </select>
+
+    <!--특정 투표에 참여한 사용자 데이터 삭제 -->
+    <delete id="deleteParticipants">
+        DELETE FROM participant WHERE vote_id = #{voteId}
+    </delete>
+
+    <!-- 투표 삭제 -->
+    <delete id="deleteVote">
+        DELETE FROM vote WHERE vote_id = #{voteId}
+    </delete>
+
+    <!-- 작성자가 투표 마감 -->
+    <update id="closeVote">
+        UPDATE vote
+        SET status = 'closed'
+        WHERE vote_id = #{voteId}
+          AND status = 'active';
+    </update>
+
+    <!-- 마감시간 지나면 투표 마감 -->
+    <update id="autoCloseVotes">
+        UPDATE vote
+        SET status = 'closed'
+        WHERE status = 'active'
+          AND deadline &lt;= NOW();
+    </update>
+
+    <!-- 특정 투표글 상태 및 정보 조회 -->
+    <select id="getVoteStatus" resultType="com.uplus.eureka.domain.vote.Vote">
+        SELECT * FROM vote WHERE vote_id = #{voteId}
+    </select>
+
 </mapper>
