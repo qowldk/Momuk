@@ -13,9 +13,16 @@
         UPDATE vote SET participants = participants + 1 WHERE vote_id = #{voteId}
     </update>
     
+    <!-- 투표 생성 -->
+	 <insert id="insertVote" parameterType="map">
+    INSERT INTO vote (creator_id, title, description, deadline, meeting_start_time, meeting_end_time, recruit)
+    VALUES (#{creatorId}, #{voteRequest.title}, #{voteRequest.description}, #{voteRequest.deadline}, 
+            #{voteRequest.meetingStartTime}, #{voteRequest.meetingEndTime}, #{voteRequest.recruit});
+  </insert>
+
      <!-- 참여자 수 감소 -->
     <update id="decrementParticipant">
         UPDATE vote SET participants = participants - 1 WHERE vote_id = #{voteId}
     </update>
-
+  
 </mapper>
