@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 @Data
 public class VoteRequest{
     private String title;
+    private String creatorId;
     private String description; 
     private LocalDateTime deadline;
     private LocalDateTime meetingStartTime;
