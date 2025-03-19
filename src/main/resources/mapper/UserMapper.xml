@@ -3,12 +3,13 @@
 
 <mapper namespace="com.uplus.eureka.domain.user.repository.UserMapper">
 
-    <select id="login" parameterType="com.uplus.eureka.domain.user.User" resultType="com.uplus.eureka.domain.user.User">
-        SELECT user_id AS userId, user_name AS userName, user_pwd AS userPwd, 
-               email_id AS emailId, email_domain AS emailDomain, join_date AS joinDate
-        FROM users
-        WHERE user_id = #{userId} AND user_pwd = #{userPwd}
-    </select>
+    <select id="login" parameterType="com.uplus.eureka.domain.user.dto.LoginRequestDTO" resultType="com.uplus.eureka.domain.user.User">
+    	SELECT user_id AS userId, user_name AS userName, user_pwd AS userPwd, 
+           	email_id AS emailId, email_domain AS emailDomain, join_date AS joinDate
+    	FROM users
+    	WHERE user_id = #{userId} AND user_pwd = #{userPwd}
+	</select>
+
     
     <insert id="signup" parameterType="com.uplus.eureka.domain.user.User">
         INSERT INTO users (user_id, user_name, user_pwd, email_id, email_domain, join_date)
