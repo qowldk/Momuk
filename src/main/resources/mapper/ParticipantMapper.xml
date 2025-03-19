@@ -15,5 +15,10 @@
             SELECT 1 FROM participant WHERE user_id = #{userId} AND vote_id = #{voteId}
         )
     </select>
+    
+     <!-- 투표 참여 취소 -->
+    <delete id="deleteParticipant">
+        DELETE FROM participant WHERE vote_id = #{voteId} AND user_id = #{userId}
+    </delete>
 
 </mapper>
