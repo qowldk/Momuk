@@ -23,7 +23,7 @@ public class SwaggerConfiguration {
     public OpenAPI openEurekaAPI() {
         logger.debug("openEurekaAPI.............");
         Info info = new Info().title("MoMuk API 명세서")
-                .description("<h3>SpringTest API Reference for Developers</h3>Swagger를 이용한 MoMuk's API<br><img src=\"/eureka/assets/img/eureka_logo.png\" width=\"50\">")
+                .description("<h3>SpringTest API Reference for Developers</h3>Swagger를 이용한 MoMuk's API<br>")
                 .version("v1")
                 .contact(new io.swagger.v3.oas.models.info.Contact().name("MoMuk Team")
                         .email("team's email").url("http://eureka.uplus.com"));
@@ -42,8 +42,12 @@ public class SwaggerConfiguration {
 
     @Bean
     public GroupedOpenApi userApi() {
-        return GroupedOpenApi.builder().group("momuk-user").pathsToMatch("/member/**").build();
+        return GroupedOpenApi.builder()
+                .group("momuk-user")
+                .pathsToMatch("/users/**")  // 컨텍스트 경로 /api는 제외
+                .build();
     }
+
 
     @Bean
     public GroupedOpenApi voteApi() {

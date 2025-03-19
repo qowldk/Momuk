@@ -11,4 +11,6 @@ public interface VoteMapper {
 
     // 투표 참여자 수 증가
     void incrementParticipants(Integer voteId);
+    
+    void decrementParticipant(Integer voteId);
 }

@@ -12,5 +12,10 @@
     <update id="incrementParticipants">
         UPDATE vote SET participants = participants + 1 WHERE vote_id = #{voteId}
     </update>
+    
+     <!-- 참여자 수 감소 -->
+    <update id="decrementParticipant">
+        UPDATE vote SET participants = participants - 1 WHERE vote_id = #{voteId}
+    </update>
 
 </mapper>
