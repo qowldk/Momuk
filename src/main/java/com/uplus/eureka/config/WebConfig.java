@@ -22,7 +22,6 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/users/login",
                         "/api/users/signup",
                         "/api/users/logout/{userId}",
-                        "/api/users/refresh",
                         "/api/votes/status",
                         "/api/votes/auto-close",
                         "/swagger-ui/**",
