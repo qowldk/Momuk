@@ -39,7 +39,7 @@ public class VoteController {
             security = @SecurityRequirement(name = "bearerAuth")  // 개별 메서드에서도 인증 필요 명시 가능
 
     		)
-    @PostMapping("/create")
+    @PostMapping("")
     public ResponseEntity<String> createVote(
     		@RequestHeader(value = "Authorization") String token,
             @RequestBody VoteRequest voteRequest
@@ -115,7 +115,7 @@ public class VoteController {
     /**
      * JWT 인증을 이용한 투표 삭제 API
      */
-    @DeleteMapping("/delete/{voteId}")
+    @DeleteMapping("/{voteId}")
     @Operation(summary = "투표 삭제", description = "작성자가 자신의 투표를 삭제할 수 있습니다.")
     public ResponseEntity<String> deleteVote(
             @PathVariable int voteId,
@@ -174,7 +174,7 @@ public class VoteController {
     /**
      * ✅ 특정 투표글 상태 조회 API
      */
-    @GetMapping("/status/{voteId}")
+    @GetMapping("/{voteId}/status")
     @Operation(summary = "투표 상태 조회", description = "특정 투표글의 상태(active/closed)를 조회합니다.")
     public ResponseEntity<?> getVoteStatus(@PathVariable Integer voteId) {
         Vote vote = voteService.getVoteStatus(voteId);
