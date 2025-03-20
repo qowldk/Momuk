@@ -5,7 +5,9 @@ import com.uplus.eureka.domain.participant.repository.ParticipantMapper;
 import com.uplus.eureka.domain.vote.repository.VoteMapper;
 import lombok.RequiredArgsConstructor;
 
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ParticipantService {
 
     private final ParticipantMapper participantMapper;
-    private final VoteMapper voteMapper; 
+    private final VoteMapper voteMapper;
 
     @Transactional
     public void registerParticipation(Integer voteId, String userId) {
@@ -45,7 +47,7 @@ public class ParticipantService {
         // 참여 인원 업데이트
         voteMapper.incrementParticipants(voteId);
     }
-    
+
 
     @Transactional
     public void cancelParticipation(Integer voteId, String userId) {
@@ -65,6 +67,18 @@ public class ParticipantService {
         // 참여 인원 감소
         voteMapper.decrementParticipant(voteId);
     }
+    @Transactional(readOnly = true)
+    public List<Participant> getParticipants(Integer voteId) {
+        // 투표 존재 여부 확인
+        var vote = voteMapper.getVoteById(voteId);
+        if (vote == null) {
+            throw new RuntimeException("존재하지 않는 투표입니다.");
+        }
 
+        // 참여자 리스트 조회
+//        List<Participant> participants = participantMapper.findParticipantsByVoteId(voteId);
+//        System.out.println("!!!!!!!!" + participants.size());
+        return participantMapper.findParticipantsByVoteId(voteId);
+    }
 
 }

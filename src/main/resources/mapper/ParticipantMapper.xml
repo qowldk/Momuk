@@ -21,4 +21,8 @@
         DELETE FROM participant WHERE vote_id = #{voteId} AND user_id = #{userId}
     </delete>
 
+    <!-- 특정 투표글에 참여한 사용자 리스트 조회 -->
+    <select id="findParticipantsByVoteId" resultType="com.uplus.eureka.domain.participant.Participant">
+        SELECT  participant_id as participantId ,user_id as userId ,vote_id as voteId,created_at as createdAt  FROM participant WHERE vote_id = #{voteId}
+    </select>
 </mapper>
