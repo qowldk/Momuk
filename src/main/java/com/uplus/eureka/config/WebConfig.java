@@ -1,3 +1,4 @@
+// src/main/java/com/uplus/eureka/config/WebConfig.java
 package com.uplus.eureka.config;
 
 import org.springframework.context.annotation.Configuration;
