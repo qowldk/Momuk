@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "사용자 인증 컨트롤러", description = "로그인, 회원가입, 토큰처리 등 회원의 인증관련 처리하는 클래스")
+@Tag(name = "사용자 인증 API", description = "로그인, 회원가입, 토큰처리 등 회원의 인증관련 처리하는 API")
 @Slf4j
 public class UserController {
 
