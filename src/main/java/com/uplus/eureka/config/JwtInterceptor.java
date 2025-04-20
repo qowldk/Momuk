@@ -23,29 +23,39 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        final String authHeader = request.getHeader(HEADER_AUTH);
+
+        String uri = request.getRequestURI();
+
+        // ✅ Swagger 관련 경로는 인증 예외 처리
+        if (uri.contains("swagger") || uri.contains("api-docs")) {
+            return true;
+        }
+
+        // 기존 자동 마감, 상태 조회 예외 처리도 함께
+        if (uri.equals("/api/vote/auto-close") || uri.startsWith("/api/vote/status")) {
+            return true;
+        }
+
+        String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Authorization 헤더가 없거나 형식이 올바르지 않음. 요청 URI: {}", request.getRequestURI());
+            log.warn("Authorization 헤더가 없거나 잘못됨. 요청 URI: {}", uri);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("401 Unauthorized: 토큰이 필요합니다.");
             return false;
         }
 
-        final String token = authHeader.replace("Bearer ", "").trim();
-        log.info("요청 URL: {}", request.getRequestURI());
-        log.info("받은 Authorization 헤더: {}", token);
+        String token = authHeader.replace("Bearer ", "").trim();
 
         try {
             if (jwtUtil.checkToken(token)) {
-                log.info("토큰 사용 가능 : {}", token);
+                log.info("유효한 토큰: {}", token);
                 return true;
             } else {
-                log.warn("토큰 검증 실패 : {}", token);
                 throw new UnauthorizedException("유효하지 않은 토큰입니다.");
             }
         } catch (Exception e) {
-            log.error("토큰 검증 중 예외 발생: {}", e.getMessage());
+            log.error("토큰 검증 중 오류: {}", e.getMessage());
             throw new UnauthorizedException("유효하지 않은 토큰입니다.");
         }
     }
