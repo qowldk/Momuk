@@ -23,27 +23,6 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-
-//        //  자동 마감 API는 JWT 검증 제외
-//        if (request.getRequestURI().equals("/api/vote/auto-close")) {
-//            log.info("🚀 자동 마감 API 요청 - JWT 검증 제외");
-//            return true;  // 인증 없이 요청 통과
-//        }
-//
-//        // 투표 상태 조회 JWT 인증이 필요 없는 API 경로 설정
-//        if (request.getRequestURI().startsWith("/api/vote/status") || request.getRequestURI().startsWith("/api/vote/auto-close")) {
-//            log.info("JWT 인증이 필요 없는 API 요청: {}", request.getRequestURI());
-//            return true;  // 인증 없이 통과
-//        }
-//
-//        // ✅ Authorization 헤더가 없는 경우 처리
-//        if (request.getHeader(HEADER_AUTH) == null || request.getHeader(HEADER_AUTH).isEmpty()) {
-//            log.warn("Authorization 헤더가 없습니다. 요청 URI: {}", request.getRequestURI());
-//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-//            response.getWriter().write("401 Unauthorized: 토큰이 필요합니다.");
-//            return false;
-//        }
-
         final String authHeader = request.getHeader(HEADER_AUTH);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -69,4 +48,5 @@ public class JwtInterceptor implements HandlerInterceptor {
             log.error("토큰 검증 중 예외 발생: {}", e.getMessage());
             throw new UnauthorizedException("유효하지 않은 토큰입니다.");
         }
+    }
 }
