@@ -1,3 +1,4 @@
+/*
 package com.uplus.eureka.config;
 
 import javax.sql.DataSource;
@@ -43,3 +44,4 @@ public class DataBaseConfiguration {
         return factoryBean.getObject();
     }
 }
+ */
