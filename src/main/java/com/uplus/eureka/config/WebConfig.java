@@ -19,6 +19,9 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
+                        "/",
+                        "/error",
+                        "/favicon.ico",
                         "/api/users/login",
                         "/api/users/signup",
                         "/api/users/logout/{userId}",
@@ -26,7 +29,9 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/votes/auto-close",
                         "/swagger-ui.html",
                         "/swagger-ui/**",
-                        "/v3/api-docs/**"
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
                 );
     }
 }
