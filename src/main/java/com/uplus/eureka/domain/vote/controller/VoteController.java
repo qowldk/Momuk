@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,7 @@ public class VoteController {
             security = @SecurityRequirement(name = "bearerAuth")  // 개별 메서드에서도 인증 필요 명시 가능
 
     		)
-    @PostMapping("/create")
+    @PostMapping
     public ResponseEntity<String> createVote(
     		@RequestHeader(value = "Authorization") String token,
             @RequestBody VoteRequest voteRequest
@@ -108,7 +109,7 @@ public class VoteController {
     /**
      * JWT 인증을 이용한 투표 삭제 API
      */
-    @DeleteMapping("/delete/{voteId}")
+    @DeleteMapping("/{voteId}")
     @Operation(summary = "투표 삭제", description = "작성자가 자신의 투표를 삭제할 수 있습니다.",
     security = @SecurityRequirement(name = "bearerAuth"))
     public ResponseEntity<String> deleteVote(
@@ -155,7 +156,7 @@ public class VoteController {
      */
     @Operation(summary = "투표 마감", description = "투표 생성자가 직접 투표를 마감할 수 있습니다.",
  		   security = @SecurityRequirement(name = "bearerAuth"))
-    @PatchMapping("/close/{voteId}")
+    @PatchMapping("/{voteId}/close")
 //    @Operation(summary = "투표 생성", 
 //	description = "새로운 투표를 생성합니다.",
 //    security = @SecurityRequirement(name = "bearerAuth")  // 개별 메서드에서도 인증 필요 명시 가능
@@ -204,7 +205,7 @@ public class VoteController {
     /**
      * ✅ 특정 투표글 상태 조회 API
      */
-    @GetMapping("/status/{voteId}")
+    @GetMapping("/{voteId}")
     @Operation(summary = "투표 상태 조회", description = "특정 투표글의 상태(active/closed)를 조회합니다.")
     public ResponseEntity<?> getVoteStatus(@PathVariable Integer voteId) {
         Vote vote = voteService.getVoteStatus(voteId);
@@ -215,5 +216,21 @@ public class VoteController {
 
         return ResponseEntity.ok(vote);
     }
+
+    /**
+     * ✅ 전체 투표글 상태 조회 API
+     */
+    @GetMapping
+    @Operation(summary = "전체 투표 상태 조회", description = "등록된 모든 투표글의 상태를 조회합니다.")
+    public ResponseEntity<?> getAllVoteStatuses() {
+        List<Vote> votes = voteService.getAllVotes();
+
+        if (votes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("등록된 투표글이 없습니다.");
+        }
+
+        return ResponseEntity.ok(votes);
+    }
+
     
 }

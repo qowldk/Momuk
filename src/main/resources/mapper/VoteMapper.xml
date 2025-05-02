@@ -98,5 +98,11 @@
     <select id="getVoteStatus" resultType="com.uplus.eureka.domain.vote.Vote">
         SELECT * FROM vote WHERE vote_id = #{voteId}
     </select>
-  
+
+    <!-- 전체 투표글 상태 및 정보 조회 -->
+    <select id="getAllVotes" resultMap="VoteResultMap">
+        SELECT * FROM vote
+    </select>
+
+
 </mapper>

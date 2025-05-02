@@ -3,6 +3,8 @@ package com.uplus.eureka.domain.vote.service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -154,4 +156,11 @@ public class VoteService {
 				return voteMapper.getVoteStatus(voteId);
 			}
 
-    }
+			// 전체 투표글 상태 조회
+			@Transactional(readOnly = true)
+			public List<Vote> getAllVotes() {
+				return voteMapper.getAllVotes();
+			}
+
+
+}
