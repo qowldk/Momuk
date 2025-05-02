@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -216,6 +217,20 @@ public class VoteController {
         return ResponseEntity.ok(vote);
     }
 
+    /**
+     * ✅ 전체 투표글 상태 조회 API
+     */
+    @GetMapping("/status/all")
+    @Operation(summary = "전체 투표 상태 조회", description = "등록된 모든 투표글의 상태를 조회합니다.")
+    public ResponseEntity<?> getAllVoteStatuses() {
+        List<Vote> votes = voteService.getAllVotes();
+
+        if (votes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("등록된 투표글이 없습니다.");
+        }
+
+        return ResponseEntity.ok(votes);
+    }
 
     
 }

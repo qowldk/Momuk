@@ -3,6 +3,8 @@ package com.uplus.eureka.domain.vote.service;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
