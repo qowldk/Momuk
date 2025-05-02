@@ -1,6 +1,7 @@
 package com.uplus.eureka.domain.vote.repository;
 
 import java.util.Map;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -60,5 +61,8 @@ public interface VoteMapper {
 
     //투표 수정
     void updateVote(@Param("voteId") Integer voteId, @Param("voteRequest") VoteRequest voteRequest);
+
+    // 전체 투표글 조회
+    List<Vote> getAllVotes();
 
 }

@@ -154,4 +154,11 @@ public class VoteService {
 				return voteMapper.getVoteStatus(voteId);
 			}
 
-    }
+			// 전체 투표글 상태 조회
+			@Transactional(readOnly = true)
+			public List<Vote> getAllVotes() {
+				return voteMapper.getAllVotes();
+			}
+
+
+}
