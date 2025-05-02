@@ -220,7 +220,7 @@ public class VoteController {
     /**
      * ✅ 전체 투표글 상태 조회 API
      */
-    @GetMapping()
+    @GetMapping
     @Operation(summary = "전체 투표 상태 조회", description = "등록된 모든 투표글의 상태를 조회합니다.")
     public ResponseEntity<?> getAllVoteStatuses() {
         List<Vote> votes = voteService.getAllVotes();
