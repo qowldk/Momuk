@@ -1,5 +1,7 @@
 package com.uplus.eureka.domain.vote.repository;
 
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -13,15 +15,18 @@ public interface VoteMapper {
     // 투표글 ID로 투표 조회
     Vote getVoteById(Integer voteId);
 
-    // 투표 참여자 수 증가
     void incrementParticipants(Integer voteId);
     
     //투표 생성
     void insertVote(VoteRequest voteRequest);
-    
+    Integer getLastInsertedVoteId();
+    void insertCreatorAsParticipant(Map<String, Object> paramMap);
 
+    
     // 투표글 ID로 작성자 ID 조회
     String getVoteCreator(@Param("voteId") Integer voteId);
+    
+    
 
     /**
      * 특정 투표글에 참여한 사용자 데이터 삭제

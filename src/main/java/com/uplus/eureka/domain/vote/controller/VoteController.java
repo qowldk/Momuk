@@ -56,11 +56,12 @@ public class VoteController {
 
         // JWT에서 userId 추출 (creatorId로 사용)
         String creatorId = jwtUtil.getUserIdFromToken(token);
+        log.info("creatorId in voteRequest = {}", voteRequest.getCreatorId());
+
+        voteRequest.setCreatorId(creatorId);
+
 
         log.info("투표 생성 요청: 사용자 ID: {}, 투표 데이터: {}", creatorId, voteRequest);
-
-        // 투표 생성
-        voteRequest.setCreatorId(creatorId);
 
         voteService.createVote(voteRequest);
         

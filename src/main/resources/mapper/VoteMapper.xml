@@ -29,7 +29,7 @@
     </update>
     
     <!-- 투표 생성 -->
-	 <insert id="insertVote" parameterType="com.uplus.eureka.domain.vote.dto.VoteRequest">
+	 <insert id="insertVote" parameterType="com.uplus.eureka.domain.vote.dto.VoteRequest" useGeneratedKeys="true" keyProperty="voteId">
      INSERT INTO vote (creator_id, title, description, deadline, meeting_start_time, meeting_end_time, recruit)
     VALUES (#{creatorId}, #{title}, #{description}, #{deadline}, #{meetingStartTime}, #{meetingEndTime}, #{recruit});
 	</insert>
@@ -39,15 +39,26 @@
         UPDATE vote SET participants = participants - 1 WHERE vote_id = #{voteId}
     </update>
     
+    <!-- 방금 insert된 AutoIncrement vote_id 가져오기 -->
+	<select id="getLastInsertedVoteId" resultType="int">
+	    SELECT LAST_INSERT_ID()
+	</select>
+    
+        <!-- 작성자도 투표 참여자로 등록 -->
+    <insert id="insertCreatorAsParticipant" parameterType="map">
+        INSERT INTO participant (vote_id, user_id)
+        VALUES (#{voteId}, #{userId});
+    </insert>
+    
      <!-- 투표 수정 -->
-     <update id="updateVote" parameterType="map">
+     <update id="updateVote" parameterType="com.uplus.eureka.domain.vote.dto.VoteRequest">
         UPDATE vote
-        SET title = #{voteRequest.title},
-            description = #{voteRequest.description},
-            deadline = #{voteRequest.deadline},
-            meeting_start_time = #{voteRequest.meetingStartTime},
-            meeting_end_time = #{voteRequest.meetingEndTime},
-            recruit = #{voteRequest.recruit}
+        SET title = #title},
+            description = #{description},
+            deadline = #{deadline},
+            meeting_start_time = #{meetingStartTime},
+            meeting_end_time = #{meetingEndTime},
+            recruit = #{recruit}
         WHERE vote_id = #{voteId};
     </update>
     
