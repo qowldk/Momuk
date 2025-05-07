@@ -1,7 +1,10 @@
 package com.uplus.eureka.domain.vote.service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
+
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -22,8 +25,7 @@ public class VoteService {
 	private final VoteMapper voteMapper;
 	private final JwtUtil jwtUtil;
 	 @Transactional
-	/*투표 생성
-	 */
+	/*투표 생성*/
 	    public void createVote(VoteRequest voteRequest) {
 		    log.info("메서드 호출됨");
 		    
@@ -43,8 +45,16 @@ public class VoteService {
 	        log.info("insertVote 호출 전에 투표 제목: {}", voteRequest.getTitle());
 	        log.info("메서드 호출 전");
 	        
-	        // 데이터베이스에 투표 삽입
 	        voteMapper.insertVote(voteRequest);
+	        Integer voteId = voteRequest.getVoteId();
+	        
+	        Map<String, Object> paramMap = new HashMap<>();
+	        paramMap.put("voteId", voteId);
+	        paramMap.put("userId", voteRequest.getCreatorId());  
+
+	        voteMapper.insertCreatorAsParticipant(paramMap);
+
+	        log.info("투표 생성 및 참여자 등록 완료");
 
 	        log.info("insertVote 실행 완료, 투표 제목: {}", voteRequest.getTitle());   
 	    }
@@ -146,4 +156,11 @@ public class VoteService {
 				return voteMapper.getVoteStatus(voteId);
 			}
 
-    }
+			// 전체 투표글 상태 조회
+			@Transactional(readOnly = true)
+			public List<Vote> getAllVotes() {
+				return voteMapper.getAllVotes();
+			}
+
+
+}
