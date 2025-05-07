@@ -19,7 +19,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/users")
-@Tag(name = "사용자 인증 API", description = "로그인, 회원가입, 토큰처리 등 회원의 인증관련 처리하는 API")
+@Tag(name = "사용자 인증 컨트롤러", description = "로그인, 회원가입, 토큰처리 등 회원의 인증관련 처리하는 클래스")
 @Slf4j
 public class UserController {
 
@@ -37,7 +37,7 @@ public class UserController {
             @RequestBody @Parameter(description = "회원가입 시 필요한 회원정보", required = true) SignupRequestDTO signupRequestDTO) {
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.CREATED;
-        
+
         try {
             userService.signup(signupRequestDTO);
             resultMap.put("message", "회원가입이 성공적으로 완료되었습니다.");
@@ -47,10 +47,10 @@ public class UserController {
             resultMap.put("message", e.getMessage());
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
-        
+
         return new ResponseEntity<>(resultMap, status);
     }
-    
+
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 이용하여 로그인 처리합니다.")
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(
@@ -58,20 +58,20 @@ public class UserController {
         log.debug("login user : {}", loginRequestDTO);
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.ACCEPTED;
-        
+
         try {
             UserResponseDTO userResponseDTO = userService.login(loginRequestDTO);
-            
+
             if (userResponseDTO != null) {
                 String accessToken = jwtUtil.createAccessToken(userResponseDTO.getUserId());
                 String refreshToken = jwtUtil.createRefreshToken(userResponseDTO.getUserId());
-                
+
                 log.debug("access token : {}", accessToken);
                 log.debug("refresh token : {}", refreshToken);
-                
+
                 // 발급받은 refresh token을 DB에 저장
                 userService.saveRefreshToken(userResponseDTO.getUserId(), refreshToken);
-                
+
                 resultMap.put("userInfo", userResponseDTO);
                 resultMap.put("access-token", accessToken);
                 resultMap.put("refresh-token", refreshToken);
@@ -87,7 +87,7 @@ public class UserController {
             resultMap.put("message", e.getMessage());
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
-        
+
         return new ResponseEntity<>(resultMap, status);
     }
 
@@ -129,26 +129,46 @@ public class UserController {
     }
 
     @Operation(summary = "로그아웃", description = "회원 정보를 담은 Token을 제거합니다.")
-    @GetMapping("/logout/{userId}")
+    @GetMapping("/logout")
     public ResponseEntity<Map<String, Object>> logout(
-            @PathVariable("userId") @Parameter(description = "로그아웃 할 회원의 아이디.", required = true) String userId) {
+            @RequestHeader("Authorization") String token) {
+
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.ACCEPTED;
 
         try {
+            // Bearer prefix 제거
+            if (token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+
+            // 토큰 유효성 검사
+            if (!jwtUtil.checkToken(token)) {
+                log.error("유효하지 않은 토큰: {}", token);
+                resultMap.put("message", "유효하지 않은 토큰입니다.");
+                return new ResponseEntity<>(resultMap, HttpStatus.UNAUTHORIZED);
+            }
+
+            // 토큰에서 사용자 ID 추출
+            String userId = jwtUtil.getUserIdFromToken(token);
+
+            // 리프레시 토큰 삭제 (DB or Redis 등)
             userService.deleteRefreshToken(userId);
+
+            log.info("로그아웃 성공: {}", userId);
             resultMap.put("message", "로그아웃이 성공적으로 처리되었습니다.");
             status = HttpStatus.OK;
-            log.info("로그아웃 성공: {}", userId);
+
         } catch (Exception e) {
-            log.error("로그아웃 실패 : {}", e);
-            resultMap.put("message", e.getMessage());
+            log.error("로그아웃 처리 중 예외 발생: {}", e.getMessage(), e);
+            resultMap.put("message", "로그아웃 처리 중 오류가 발생했습니다.");
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
 
         return new ResponseEntity<>(resultMap, status);
     }
-    
+
+
     @Operation(summary = "회원인증", description = "회원 정보를 담은 Token을 반환합니다.")
     @GetMapping("/{userId}")
     public ResponseEntity<Map<String, Object>> getUserInfo(
@@ -156,7 +176,7 @@ public class UserController {
             HttpServletRequest request) {
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.ACCEPTED;
-        
+
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7); // "Bearer " 부분을 제거
@@ -181,7 +201,7 @@ public class UserController {
             resultMap.put("message", "인증 토큰이 필요합니다.");
             status = HttpStatus.BAD_REQUEST;
         }
-        
+
         return new ResponseEntity<>(resultMap, status);
     }
 }
