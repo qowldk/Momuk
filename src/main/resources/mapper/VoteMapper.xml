@@ -53,7 +53,7 @@
      <!-- 투표 수정 -->
      <update id="updateVote" parameterType="com.uplus.eureka.domain.vote.dto.VoteRequest">
         UPDATE vote
-        SET title = #title},
+        SET title = #{title},
             description = #{description},
             deadline = #{deadline},
             meeting_start_time = #{meetingStartTime},
