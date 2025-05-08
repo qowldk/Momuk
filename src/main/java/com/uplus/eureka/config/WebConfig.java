@@ -19,14 +19,20 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addInterceptor(jwtInterceptor)
                 .addPathPatterns("/**")
                 .excludePathPatterns(
+                        "/",
+                        "/error",
+                        "/favicon.ico",
                         "/api/users/login",
                         "/api/users/signup",
                         "/api/users/logout/{userId}",
                         "/api/votes",
                         "/api/votes/{voteId}",
                         "/api/votes/auto-close",
+                        "/swagger-ui.html",
                         "/swagger-ui/**",
-                        "/v3/api-docs/**"
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
                 );
     }
 }

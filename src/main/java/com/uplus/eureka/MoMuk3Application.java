@@ -6,10 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@MapperScan({
-    "com.uplus.eureka.domain.vote.repository",
-    "com.uplus.eureka.domain.participant.repository"
-})
+@MapperScan("com.uplus.eureka.domain.**.repository")
 @EnableScheduling
 public class MoMuk3Application {
 
