@@ -51,15 +51,16 @@
     </insert>
     
      <!-- 투표 수정 -->
-     <update id="updateVote" parameterType="com.uplus.eureka.domain.vote.dto.VoteRequest">
-        UPDATE vote
-        SET title = #{title},
-            description = #{description},
-            deadline = #{deadline},
-            meeting_start_time = #{meetingStartTime},
-            meeting_end_time = #{meetingEndTime},
-            recruit = #{recruit}
-        WHERE vote_id = #{voteId};
+     <update id="updateVote">
+         UPDATE vote
+         SET
+             title = #{voteRequest.title},
+             description = #{voteRequest.description},
+             deadline = #{voteRequest.deadline},
+             meeting_start_time = #{voteRequest.meetingStartTime},
+             meeting_end_time = #{voteRequest.meetingEndTime},
+             recruit = #{voteRequest.recruit}
+         WHERE vote_id = #{voteId}
     </update>
     
        <!-- 투표 삭제 -->
