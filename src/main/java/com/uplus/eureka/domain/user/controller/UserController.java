@@ -8,7 +8,9 @@ import com.uplus.eureka.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -54,7 +56,9 @@ public class UserController {
     @Operation(summary = "로그인", description = "아이디와 비밀번호를 이용하여 로그인 처리합니다.")
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> login(
-            @RequestBody @Parameter(description = "로그인 시 필요한 회원정보(아이디, 비밀번호).", required = true) LoginRequestDTO loginRequestDTO) {
+            @RequestBody @Parameter(description = "로그인 시 필요한 회원정보(아이디, 비밀번호).", required = true) LoginRequestDTO loginRequestDTO,
+            HttpServletResponse response) {
+
         log.debug("login user : {}", loginRequestDTO);
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.ACCEPTED;
@@ -69,12 +73,16 @@ public class UserController {
                 log.debug("access token : {}", accessToken);
                 log.debug("refresh token : {}", refreshToken);
 
-                // 발급받은 refresh token을 DB에 저장
+                // ✅ Set access token as cookie (manually with SameSite=None)
+                // refreshToken을 HttpOnly 쿠키로 저장
+                String cookieValue = String.format("refreshToken=%s; Max-Age=604800; Path=/; HttpOnly; Secure; SameSite=None", refreshToken);
+                response.addHeader("Set-Cookie", cookieValue);
+
+                // ✅ Store refresh token
                 userService.saveRefreshToken(userResponseDTO.getUserId(), refreshToken);
 
                 resultMap.put("userInfo", userResponseDTO);
                 resultMap.put("access-token", accessToken);
-                resultMap.put("refresh-token", refreshToken);
                 status = HttpStatus.CREATED;
                 log.info("로그인 성공: {}", userResponseDTO.getUserId());
             } else {
@@ -91,7 +99,6 @@ public class UserController {
         return new ResponseEntity<>(resultMap, status);
     }
 
-    @Operation(summary = "Access Token 재발급", description = "유효한 Refresh Token을 이용하여 새로운 Access Token을 재발급합니다.")
     @PostMapping("/refresh-token")
     public ResponseEntity<Map<String, Object>> refreshAccessToken(
             @RequestHeader("Authorization") String refreshTokenHeader) {
@@ -99,10 +106,8 @@ public class UserController {
         HttpStatus status = HttpStatus.OK;
 
         try {
-            // Authorization 헤더에서 'Bearer ' 제거
             String refreshToken = refreshTokenHeader.replace("Bearer ", "").trim();
 
-            // Refresh Token 검증
             if (!jwtUtil.validateToken(refreshToken)) {
                 resultMap.put("message", "유효하지 않거나 만료된 Refresh Token입니다.");
                 status = HttpStatus.UNAUTHORIZED;
@@ -110,10 +115,7 @@ public class UserController {
                 return new ResponseEntity<>(resultMap, status);
             }
 
-            // 사용자 ID 추출
             String userId = jwtUtil.getUserIdFromToken(refreshToken);
-
-            // 새로운 Access Token 생성
             String newAccessToken = jwtUtil.createAccessToken(userId);
 
             resultMap.put("access-token", newAccessToken);
@@ -128,32 +130,53 @@ public class UserController {
         return new ResponseEntity<>(resultMap, status);
     }
 
-    @Operation(summary = "로그아웃", description = "회원 정보를 담은 Token을 제거합니다.")
     @GetMapping("/logout")
+    @CrossOrigin(
+            origins = "http://localhost:5174",
+            allowCredentials = "true",
+            allowedHeaders = "*",
+            methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.OPTIONS})
     public ResponseEntity<Map<String, Object>> logout(
-            @RequestHeader("Authorization") String token) {
+            HttpServletRequest request, HttpServletResponse response) {
 
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.ACCEPTED;
 
         try {
-            // Bearer prefix 제거
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7);
+            String token = null;
+            Cookie[] cookies = request.getCookies();
+
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    log.debug("요청 쿠키: {} = {}", cookie.getName(), cookie.getValue());
+                    if ("accessToken".equals(cookie.getName())) {
+                        token = cookie.getValue();
+                    }
+                }
             }
 
-            // 토큰 유효성 검사
-            if (!jwtUtil.checkToken(token)) {
-                log.error("유효하지 않은 토큰: {}", token);
+            if (token == null) {
+                log.error("accessToken 쿠키가 없습니다.");
+                resultMap.put("message", "accessToken 쿠키가 없습니다.");
+                return new ResponseEntity<>(resultMap, HttpStatus.UNAUTHORIZED);
+            }
+
+            boolean isValid = jwtUtil.checkToken(token);
+            log.debug("토큰 유효성 검사 결과: {}", isValid);
+
+            if (!isValid) {
+                log.error("토큰이 유효하지 않음 (만료 또는 위조)");
                 resultMap.put("message", "유효하지 않은 토큰입니다.");
                 return new ResponseEntity<>(resultMap, HttpStatus.UNAUTHORIZED);
             }
 
-            // 토큰에서 사용자 ID 추출
             String userId = jwtUtil.getUserIdFromToken(token);
+            log.debug("토큰에서 추출한 사용자 ID: {}", userId);
 
-            // 리프레시 토큰 삭제 (DB or Redis 등)
             userService.deleteRefreshToken(userId);
+
+            // ✅ Remove the cookie
+            response.addHeader("Set-Cookie", "accessToken=; Max-Age=0; Path=/; HttpOnly; Secure; SameSite=None");
 
             log.info("로그아웃 성공: {}", userId);
             resultMap.put("message", "로그아웃이 성공적으로 처리되었습니다.");
@@ -168,18 +191,18 @@ public class UserController {
         return new ResponseEntity<>(resultMap, status);
     }
 
-
     @Operation(summary = "회원인증", description = "회원 정보를 담은 Token을 반환합니다.")
     @GetMapping("/{userId}")
     public ResponseEntity<Map<String, Object>> getUserInfo(
-            @PathVariable("userId") @Parameter(description = "인증할 회원의 아이디.", required = true) String userId,
+            @PathVariable("userId") String userId,
             HttpServletRequest request) {
+
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.ACCEPTED;
 
         String authorizationHeader = request.getHeader("Authorization");
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7); // "Bearer " 부분을 제거
+            String token = authorizationHeader.substring(7);
             if (jwtUtil.checkToken(token)) {
                 log.info("사용 가능한 토큰!!!");
                 try {
