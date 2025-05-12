@@ -17,7 +17,9 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 	@Override
 	public void addCorsMappings(CorsRegistry registry) {
 		registry.addMapping("/**")
-				.allowedOrigins("http://localhost:5174") // 프론트엔드 포트 지정
+				.allowedOrigins(
+						"http://localhost:5174",
+						"http://localhost:5173")
 				.allowedMethods(
 						HttpMethod.GET.name(),
 						HttpMethod.POST.name(),
@@ -27,9 +29,10 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 						HttpMethod.OPTIONS.name(),
 						HttpMethod.PATCH.name()
 				)
-				.allowedHeaders("*")
-				.allowCredentials(true) // ✅ 쿠키 허용
-				.maxAge(1800);
+				.allowedHeaders("*") // 모든 요청 헤더 허용
+				.exposedHeaders("Authorization", "Set-Cookie") // 응답 헤더 노출 설정
+				.allowCredentials(true) // ✅ 인증정보 포함(Cookie 등)
+				.maxAge(3600); // pre-flight 요청 캐싱 시간
 	}
 
 	@Override

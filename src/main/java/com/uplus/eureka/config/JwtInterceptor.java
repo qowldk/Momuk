@@ -4,9 +4,6 @@ import com.uplus.eureka.domain.user.exception.UnauthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Enumeration;
-
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -36,10 +33,15 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String authHeader = request.getHeader("Authorization");
+        // 로그아웃 경로는 인증 예외 처리 (Authorization 헤더 없이도 허용)
+        if (uri.equals("/api/users/logout")) {
+            return true;
+        }
+
+        String authHeader = request.getHeader(HEADER_AUTH);
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            log.warn("Authorization 헤더가 없거나 잘못됨. 요청 URI: {}", uri);
+            log.warn("Authorization 헤더가 없거나 잘못됨. 요청 URI: {}, 헤더 값: {}", uri, authHeader);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("401 Unauthorized: 토큰이 필요합니다.");
             return false;
