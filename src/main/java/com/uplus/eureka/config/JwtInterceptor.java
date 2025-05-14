@@ -33,20 +33,16 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         }
 
-<<<<<<< HEAD
-        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
-            return true;
-        }
-
-        String authHeader = request.getHeader("Authorization");
-=======
         // 로그아웃 경로는 인증 예외 처리 (Authorization 헤더 없이도 허용)
         if (uri.equals("/api/users/logout")) {
             return true;
-        }
+        };
+
+        if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+            return true;
+        };
 
         String authHeader = request.getHeader(HEADER_AUTH);
->>>>>>> e053456a0658c6fa316b3731d89804900567cba2
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             log.warn("Authorization 헤더가 없거나 잘못됨. 요청 URI: {}, 헤더 값: {}", uri, authHeader);
