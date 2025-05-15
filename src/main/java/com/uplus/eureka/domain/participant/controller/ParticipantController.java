@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.uplus.eureka.domain.participant.dto.ParticipantResponse;
+
 
 
 @Slf4j
@@ -116,10 +118,6 @@ public class ParticipantController {
         log.info("투표 참여자 리스트 조회 완료: 투표 ID: {}, 참여자 수: {}", voteId, participants.size());
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("{\"participants\": [");
-
-        // 참여자 리스트 조회
-        List<Participant> participants = participantService.getParticipants(voteId);
-        log.info("투표 참여자 리스트 조회 완료: 투표 ID: {}, 참여자 수: {}", voteId, participants.size());
 
         // ParticipantResponse DTO로 변환
         List<ParticipantResponse> responseList = participants.stream()
