@@ -26,11 +26,11 @@
         SELECT
             p.participant_id AS participantId,
             p.vote_id AS voteId,
+            p.user_id AS userId,
             p.created_at AS createdAt,
-            u.user_id AS userId,
             u.name AS userName
         FROM participant p
-                 JOIN "user" u ON p.participant_id = u.user_id
+                 JOIN users u ON p.user_id = u.user_id
         WHERE p.vote_id = #{voteId}
     </select>
 </mapper>
