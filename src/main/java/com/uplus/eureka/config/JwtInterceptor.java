@@ -38,6 +38,10 @@ public class JwtInterceptor implements HandlerInterceptor {
             return true;
         };
 
+        if (uri.equals("/api/users/refresh-token")) {
+            return true;
+        };
+
         if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
             return true;
         };
