@@ -100,13 +100,29 @@ public class UserController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<Map<String, Object>> refreshAccessToken(
-            @RequestHeader("Authorization") String refreshTokenHeader) {
+    public ResponseEntity<Map<String, Object>> refreshAccessToken(HttpServletRequest request) {
         Map<String, Object> resultMap = new HashMap<>();
         HttpStatus status = HttpStatus.OK;
 
         try {
-            String refreshToken = refreshTokenHeader.replace("Bearer ", "").trim();
+            String refreshToken = null;
+            Cookie[] cookies = request.getCookies();
+
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    if ("refreshToken".equals(cookie.getName())) {
+                        refreshToken = cookie.getValue();
+                        break;
+                    }
+                }
+            }
+
+            if (refreshToken == null) {
+                resultMap.put("message", "Refresh Token 쿠키가 없습니다.");
+                status = HttpStatus.UNAUTHORIZED;
+                log.warn("Refresh Token 쿠키 없음");
+                return new ResponseEntity<>(resultMap, status);
+            }
 
             if (!jwtUtil.validateToken(refreshToken)) {
                 resultMap.put("message", "유효하지 않거나 만료된 Refresh Token입니다.");
