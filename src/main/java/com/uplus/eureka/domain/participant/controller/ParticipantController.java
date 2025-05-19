@@ -114,10 +114,10 @@ public class ParticipantController {
         log.info("투표 ID: {}, 사용자 ID: {}", voteId, userId);
 
         // 참여자 리스트 조회
-        List<Participant> participants = participantService.getParticipants(voteId);
-        log.info("투표 참여자 리스트 조회 완료: 투표 ID: {}, 참여자 수: {}", voteId, participants.size());
-        StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.append("{\"participants\": [");
+        //List<Participant> participants = participantService.getParticipants(voteId);
+        //log.info("투표 참여자 리스트 조회 완료: 투표 ID: {}, 참여자 수: {}", voteId, participants.size());
+        //StringBuilder jsonBuilder = new StringBuilder();
+        //jsonBuilder.append("{\"participants\": [");
 
         // 참여자 리스트 조회
         List<Participant> participants = participantService.getParticipants(voteId);
