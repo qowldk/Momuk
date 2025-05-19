@@ -119,17 +119,16 @@ public class ParticipantController {
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.append("{\"participants\": [");
 
-        for (int i = 0; i < participants.size(); i++) {
-            Participant p = participants.get(i);
-            if (p != null) {
-                jsonBuilder.append(String.format("{\"id\": %d, \"name\": \"%s\"}", p.getParticipantId(), p.getUserId()));
-                if (i < participants.size() - 1) {
-                    jsonBuilder.append(",");
-                }
-            }
-        }
+        // 참여자 리스트 조회
+        List<Participant> participants = participantService.getParticipants(voteId);
+        log.info("투표 참여자 리스트 조회 완료: 투표 ID: {}, 참여자 수: {}", voteId, participants.size());
 
-        jsonBuilder.append("]}");
+        // ParticipantResponse DTO로 변환
+        List<ParticipantResponse> responseList = participants.stream()
+                .map(p -> new ParticipantResponse(p.getUserId(), p.getUserName()))
+                .collect(Collectors.toList());
+
+        // 자동 JSON 응답
         return ResponseEntity.ok(responseList);
     }
 }
