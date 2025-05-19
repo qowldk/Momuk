@@ -19,7 +19,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 		registry.addMapping("/**")
 				.allowedOrigins(
 						"http://localhost:5174",
-						"http://localhost:5173")
+						"http://localhost:5173",
+						"https://frontend3-test.vercel.app",
+						"https://frontend3-test-git-develop-neungdongs-projects.vercel.app",
+						"https://frontend3-test-gh5fwwqa4-neungdongs-projects.vercel.app"
+				)
 				.allowedMethods(
 						HttpMethod.GET.name(),
 						HttpMethod.POST.name(),
