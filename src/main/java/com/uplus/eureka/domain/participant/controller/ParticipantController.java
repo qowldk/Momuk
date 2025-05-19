@@ -98,44 +98,38 @@ public class ParticipantController {
             @Parameter(description = "참여자 리스트를 조회할 투표 ID", example = "1") @PathVariable Integer voteId,
             @RequestHeader("Authorization") String token
     ) {
-        try {
-            if (token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
+        // Bearer prefix 제거
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
 
-            if (!jwtUtil.checkToken(token)) {
-                log.error("유효하지 않은 토큰: {}", token);
-                return ResponseEntity.status(401).body("{\"error\": \"Unauthorized\"}");
-            }
+        // 토큰 유효성 검증
+        if (!jwtUtil.checkToken(token)) {
+            log.error("유효하지 않은 토큰: {}", token);
+            return ResponseEntity.status(401).body("{\"error\": \"Unauthorized\"}");
+        }
 
-            String userId = jwtUtil.getUserIdFromToken(token);
-            log.info("투표 ID: {}, 사용자 ID: {}", voteId, userId);
+        // 유효한 토큰에서 userId 추출
+        String userId = jwtUtil.getUserIdFromToken(token);
+        log.info("투표 ID: {}, 사용자 ID: {}", voteId, userId);
 
-            List<Participant> participants = participantService.getParticipants(voteId);
-            log.info("투표 참여자 리스트 조회 완료: 투표 ID: {}, 참여자 수: {}", voteId, participants.size());
-            StringBuilder jsonBuilder = new StringBuilder();
-            jsonBuilder.append("{\"participants\": [");
+        // 참여자 리스트 조회
+        List<Participant> participants = participantService.getParticipants(voteId);
+        log.info("투표 참여자 리스트 조회 완료: 투표 ID: {}, 참여자 수: {}", voteId, participants.size());
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.append("{\"participants\": [");
 
-            for (int i = 0; i < participants.size(); i++) {
-                Participant p = participants.get(i);
-                if (p != null) {
-                    jsonBuilder.append(String.format("{\"id\": %d, \"name\": \"%s\"}", p.getParticipantId(), p.getUserId()));
-                    if (i < participants.size() - 1) {
-                        jsonBuilder.append(",");
-                    }
+        for (int i = 0; i < participants.size(); i++) {
+            Participant p = participants.get(i);
+            if (p != null) {
+                jsonBuilder.append(String.format("{\"id\": %d, \"name\": \"%s\"}", p.getParticipantId(), p.getUserId()));
+                if (i < participants.size() - 1) {
+                    jsonBuilder.append(",");
                 }
             }
-
-            jsonBuilder.append("]}");
-
-            return ResponseEntity.ok(jsonBuilder.toString());
-
-        } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            log.warn("만료된 토큰으로 접근 시도: {}", e.getMessage());
-            return ResponseEntity.status(401).body("{\"error\": \"토큰이 만료되었습니다.\"}");
-        } catch (Exception e) {
-            log.error("참여자 리스트 조회 중 예외 발생", e);
-            return ResponseEntity.status(500).body("{\"error\": \"서버 내부 오류\"}");
         }
+
+        jsonBuilder.append("]}");
+        return ResponseEntity.status(200).body(jsonBuilder.toString());
     }
 }
