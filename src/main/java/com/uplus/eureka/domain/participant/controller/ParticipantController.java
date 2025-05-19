@@ -130,6 +130,6 @@ public class ParticipantController {
         }
 
         jsonBuilder.append("]}");
-        return ResponseEntity.status(200).body(jsonBuilder.toString());
+        return ResponseEntity.ok(responseList);
     }
 }
