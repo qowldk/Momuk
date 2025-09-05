@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.uplus.eureka.domain.participant.repository.ParticipantMapper">
+
+    <!-- 참여 등록 -->
+    <insert id="insertParticipant" parameterType="com.uplus.eureka.domain.participant.Participant">
+        INSERT INTO participant (user_id, vote_id, created_at)
+        VALUES (#{userId}, #{voteId}, #{createdAt})
+    </insert>
+
+    <!-- 한 투표글에 중복 참여 확인 -->
+    <select id="existsByUserIdAndVoteId" resultType="boolean">
+        SELECT EXISTS (
+            SELECT 1 FROM participant WHERE user_id = #{userId} AND vote_id = #{voteId}
+        )
+    </select>
+    
+     <!-- 투표 참여 취소 -->
+    <delete id="deleteParticipant">
+        DELETE FROM participant WHERE vote_id = #{voteId} AND user_id = #{userId}
+    </delete>
+
+    <!-- 특정 투표글에 참여한 사용자 리스트 조회 -->
+    <select id="findParticipantsByVoteId" resultType="com.uplus.eureka.domain.participant.Participant">
+        SELECT
+            p.participant_id AS participantId,
+            p.vote_id AS voteId,
+            p.user_id AS userId,
+            p.created_at AS createdAt,
+            u.user_name AS userName
+        FROM participant p
+                 JOIN users u ON p.user_id = u.user_id
+        WHERE p.vote_id = #{voteId}
+    </select>
+</mapper>
